@@ -1,6 +1,6 @@
 # template-node-ts-docker
 
-NodeJS、TypeScript、Docker のテンプレート
+Node.js、TypeScript、Docker のテンプレート
 
 ## 使い方
 
