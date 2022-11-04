@@ -1,4 +1,4 @@
-FROM node:16-alpine3.15 as builder
+FROM node:18-alpine3.16 as builder
 ENV NODE_ENV development
 
 WORKDIR /app
@@ -13,18 +13,17 @@ COPY . .
 RUN yarn build
 RUN yarn install --prod --frozen-lockfile
 
-FROM gcr.io/distroless/nodejs:16
+FROM gcr.io/distroless/nodejs:18
 ENV NODE_ENV production
 
 WORKDIR /app
 
 COPY --from=builder --chown=nonroot:nonroot /tini /tini
 COPY --from=builder --chown=nonroot:nonroot /app/node_modules ./node_modules
-COPY --from=builder --chown=nonroot:nonroot /app/out ./out
+COPY --from=builder --chown=nonroot:nonroot /app/dist ./dist
 COPY --chown=nonroot:nonroot . .
 
 USER nonroot
-EXPOSE 3000
 
 ENTRYPOINT [ "/tini", "--", "/nodejs/bin/node" ]
-CMD ["-r", "dotenv/config", "/app/out/app.js"]
+CMD ["-r", "dotenv/config", "/app/dist/index.js"]

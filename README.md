@@ -10,7 +10,7 @@ Node.js、TypeScript、Docker のテンプレート
 yarn dev
 ```
 
-実行されるファイルは`src/app.ts`です。
+実行されるファイルは`src/index.ts`です。
 
 ### 本番用に起動
 

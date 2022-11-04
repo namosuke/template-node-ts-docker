@@ -1,8 +1,21 @@
 {
   "name": "template-node-ts-docker",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "description": "Node.js、TypeScript、Docker のテンプレート",
+  "keywords": [
+    "template",
+    "node",
+    "typescript",
+    "docker"
+  ],
   "author": "https://github.com/namosuke",
+  "homepage": "https://github.com/namosuke/template-node-ts-docker",
   "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
   "dependencies": {
     "dotenv": "^16.0.2"
   },
@@ -12,8 +25,9 @@
     "typescript": "^4.8.3"
   },
   "scripts": {
-    "dev": "ts-node -r dotenv/config src/app.ts",
-    "build": "tsc",
-    "start": "node -r dotenv/config out/app.js || echo NOTE: run `yarn build` first"
+    "dev": "ts-node -r dotenv/config src/index.ts",
+    "test": "ts-node -r dotenv/config",
+    "build": "rm -rf dist && tsc",
+    "start": "node -r dotenv/config dist/index.js || echo WARN: run `yarn build` first"
   }
 }
