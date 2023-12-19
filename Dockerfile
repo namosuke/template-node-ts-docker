@@ -1,29 +1,27 @@
-FROM node:18-alpine3.16 as builder
-ENV NODE_ENV development
-
+#==================================================
+FROM node:20-alpine AS base
 WORKDIR /app
 
-ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini
-RUN chmod +x /tini
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
-COPY package.json yarn.lock ./
-RUN yarn install --dev --frozen-lockfile
+COPY package.json pnpm-lock.yaml ./
+#==================================================
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+#==================================================
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --dev --frozen-lockfile
 COPY . .
-RUN yarn build
-RUN yarn install --prod --frozen-lockfile
-
-FROM gcr.io/distroless/nodejs:18
-ENV NODE_ENV production
-
+RUN pnpm run build
+#==================================================
+FROM gcr.io/distroless/nodejs20-debian12
 WORKDIR /app
 
-COPY --from=builder --chown=nonroot:nonroot /tini /tini
-COPY --from=builder --chown=nonroot:nonroot /app/node_modules ./node_modules
-COPY --from=builder --chown=nonroot:nonroot /app/dist ./dist
-COPY --chown=nonroot:nonroot . .
+COPY --from=prod-deps --chown=nonroot:nonroot /app/node_modules ./node_modules
+COPY --from=build --chown=nonroot:nonroot /app/dist ./dist
 
 USER nonroot
 
-ENTRYPOINT [ "/tini", "--", "/nodejs/bin/node" ]
-CMD ["-r", "dotenv/config", "/app/dist/index.js"]
+CMD ["dist/index.js"]

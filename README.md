@@ -4,29 +4,48 @@ Node.js、TypeScript、Docker のテンプレート
 
 ## 使い方
 
+### ファイル名を指定して実行
+
+```sh
+pnpm ts src/index.ts
+```
+
 ### 開発用に起動
 
 ```sh
-yarn dev
+pnpm dev
 ```
-
-実行されるファイルは`src/index.ts`です。
 
 ### 本番用に起動
 
 ```sh
-yarn build
-yarn start
+pnpm build
+pnpm start
 ```
 
-### Docker で本番用に起動
+### Docker
 
-コマンド例：
+一時的に起動したい場合
+
+```sh
+docker build -t project-name . && docker run --rm -it --env-file .env -p 3000:3000 project-name
+```
+
+ビルド
 
 ```sh
 docker build -t project-name .
+```
+
+デバッグしたい場合
+
+```sh
 docker run --rm -it project-name
-// とか
+```
+
+実行し続ける場合
+
+```sh
 docker run -it -d --restart always --env-file .env -p 3000:3000 project-name
 ```
 
